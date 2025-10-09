@@ -1,0 +1,110 @@
+## Sample Systemd Unit File
+    [Unit]
+    Description=ACI Producer Service
+    After=network.target
+    
+    [Service]
+    User=root
+    WorkingDirectory=/home/pdc/app/lib
+    ExecStart=/usr/bin/java -Dspring.profiles.active=Production -jar /home/pdc/app/lib/aci-producer.jar
+    SuccessExitStatus=143
+    Restart=always
+    RestartSec=10
+    StandardOutput=append:/home/pdc/app/logs/aci-producer.log
+    StandardError=append:/home/pdc/app/logs/aci-producer-error.log
+    
+    [Install]
+    WantedBy=multi-user.target
+_____________________________________________________________
+
+Breakdown of Systemd Fields
+    Description: Describes the service.
+    After: Ensures service starts after network.target.
+    User: The user account that runs the service (root here, but should ideally be a non-root user).
+    WorkingDirectory: Sets the working directory for the service.
+    ExecStart: Command used to start the Java application.
+    SuccessExitStatus=143: Treats Java’s SIGTERM (exit code 143) as a successful shutdown.
+    Restart=always: Restarts the app on any failure or exit.
+    RestartSec=10: Waits 10 seconds before restarting.
+    StandardOutput / StandardError: Appends logs to files.
+    WantedBy=multi-user.target: Enables service to start at boot.
+_____________________________________________________________
+Commands After Editing .service File
+    sudo vim /etc/systemd/system/aci-producer.service   # Edit the file
+    sudo systemctl daemon-reload                        # Reload systemd configs
+    sudo systemctl restart aci-producer.service         # Restart the service
+    sudo systemctl status aci-producer.service          # Check status
+    sudo journalctl -u aci-producer.service -f          # View live logs
+    sudo systemctl enable aci-producer.service          # Enable at boot
+
+_____________________________________________________________
+Common Questions and Detailed Answers
+
+Q: What is systemd?
+    system and service manager for Linux. It initializes the system and manages services.
+
+Q: What is a systemd unit file?
+    unit file that tells systemd how to start, stop, and manage a service.
+
+Q: How do you enable a service at boot?
+    sudo systemctl enable <service-name>
+
+Q: How to start/stop a service?
+    sudo systemctl start <service-name>
+    sudo systemctl stop <service-name>
+
+Q: Purpose of WorkingDirectory and ExecStart?
+    WorkingDirectory: Default directory where the command runs.
+    ExecStart: Actual command to launch your app.
+
+Q: Why SuccessExitStatus=143?
+    Exit code 143 = SIGTERM, which is common for Java apps. Tells systemd this is not a failure.
+
+Q: What does Restart=always do?
+    Auto-restarts service on any exit or failure.
+
+Q: Difference between start, enable, restart, reload?
+    start: Starts the service now.\
+    enable: Starts the service at boot.
+    restart: Stops and then starts the service.
+    reload: Applies configuration changes (if supported by the app).
+
+Q: Logging methods in the unit?
+    Logs are written to files via StandardOutput and StandardError.
+
+Q: Security concerns with systemd?
+    Risk of privilege escalation. Use a dedicated non-root user to run services.
+
+Q: How to rotate logs?
+    Use logrotate or centralize logs via CloudWatch, ELK, etc.
+
+Q: How to make the service wait for a database?
+    Requires=mysqld.service
+    After=mysqld.service
+
+Q: How to optimize a Java service?
+    ExecStart=/usr/bin/java -Xms512m -Xmx1024m -jar ...
+
+Q: Resource limits in systemd?
+    LimitNOFILE=65536
+    MemoryMax=512M
+
+Q: Secure environment variables?
+    Use EnvironmentFile=/etc/myapp/env.conf with chmod 600 to secure environment files.
+
+Q: How to check why a service failed?
+    sudo systemctl status <service>
+    sudo journalctl -xe
+
+Q: How to prevent a service from restarting?
+    Restart=no
+Q: How to handle multiple Java apps with systemd?
+    Create separate .service files for each with unique ExecStart and log files.
+
+Best Practices
+    Use non-root users for running services.
+        Running services as non-root users minimizes security risks by limiting system access, aligning with the principle of least privilege.
+    Keep log files rotated using logrotate or centralized solutions.
+    Always use systemctl daemon-reload after every change to .service files.
+    Use Spring profiles to isolate environment configurations.
+    Use journalctl for centralized log debugging.
