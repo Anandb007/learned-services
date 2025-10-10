@@ -260,4 +260,50 @@ Example: Simple Nginx Dockerfile with custom config
     EXPOSE 80
     CMD ["nginx", "-g", "daemon off;"]
 
+________________________________________
 
+Understanding CMD and Passing Flags/Arguments in Dockerfile
+________________________________________
+1️⃣ What is CMD in Dockerfile?
+    •	The CMD instruction specifies the default command and its arguments that will run when a container starts from the image.
+    •	It can be written in two forms:
+    o	Shell form (runs in /bin/sh -c):
+    o	CMD nginx -g 'daemon off;'
+    o	Exec form (preferred, runs as a direct process):
+    o	CMD ["nginx", "-g", "daemon off;"]
+    •	The exec form uses a JSON array where each element is a separate token — command and its arguments.
+________________________________________
+2️⃣ How do flags like -g and -f work here?
+    •	Flags like -g (Nginx) or -f (HAProxy) are command-line options passed to the main executable.
+    •	Example:
+    •	CMD ["nginx", "-g", "daemon off;"]
+    o	Runs the nginx binary with the -g flag.
+    o	-g "daemon off;" tells Nginx to run in the foreground (i.e., don’t daemonize), which is important inside containers.
+    •	Similarly, for HAProxy:
+    •	CMD ["haproxy", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
+    o	Runs haproxy with the -f flag specifying the config file to use.
+________________________________________
+3️⃣ Why pass flags in CMD?
+    •	Containers usually expect the main process to run in the foreground.
+    •	Flags like -g daemon off; (Nginx) or specifying config files (HAProxy) control how the service runs.
+    •	This ensures that Docker can manage the lifecycle of the container properly.
+________________________________________
+4️⃣ How to define these flags in CMD for any service or stack?
+General rule:
+    •	Use the exec form of CMD for clarity and reliability.
+    •	Provide the executable and all required arguments as separate array elements.
+    Example:
+    CMD ["<executable>", "<flag1>", "<flag2>", "<value>", ...]
+For different stacks:
+    Stack	Example CMD with flags	Explanation
+    Nginx	["nginx", "-g", "daemon off;"]	Run Nginx in foreground
+    HAProxy	["haproxy", "-f", "/path/to/haproxy.cfg"]	Use custom HAProxy config file
+    Python	["python", "app.py", "--port", "5000"]	Pass arguments to Python script
+    Node.js	["node", "server.js", "--env", "production"]	Pass CLI args to Node app
+    Java	["java", "-jar", "app.jar", "--spring.profiles.active=prod"]	Pass Java app args
+________________________________________
+5️⃣ What if I want to override or pass runtime args?
+    •	You can override the CMD arguments when running the container:
+docker run <image> <new-command-or-args>
+    •	Example overriding Nginx command:
+docker run my-nginx nginx -g "daemon off;" -c /custom/nginx.conf
