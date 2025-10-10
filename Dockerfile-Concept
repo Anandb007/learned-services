@@ -1,0 +1,92 @@
+🚀 Dockerfiles for Different Stacks
+________________________________________
+1️⃣ Python Dockerfile
+
+Typical for Python apps like Flask, Django, or any Python script.    
+    # Use official Python base image
+    FROM python:3.11-slim
+    # Set working directory
+    WORKDIR /app
+    # Copy requirements and install dependencies
+    COPY requirements.txt .
+    RUN pip install --no-cache-dir -r requirements.txt
+    # Copy app code
+    COPY . .
+    # Expose the port your app listens on (example 5000 for Flask)
+    EXPOSE 5000
+    # Run the app
+    CMD ["python", "app.py"]
+________________________________________ 
+2️⃣ Node.js Dockerfile
+
+For Node.js apps (Express, React SSR, etc).
+    # Use official Node.js base image
+    FROM node:18-alpine
+    # Set working directory
+    WORKDIR /usr/src/app
+    # Copy package files and install dependencies
+    COPY package*.json ./
+    RUN npm install --production
+    # Copy app code
+    COPY . .
+    # Expose app port (example 3000)
+    EXPOSE 3000
+    # Run the app
+    CMD ["node", "server.js"]
+________________________________________
+3️⃣ Java Dockerfile
+For Java apps, typically built using Maven or Gradle and run with java -jar.
+    # Use official OpenJDK image
+    FROM openjdk:17-jdk-slim
+    # Copy the jar file from host to image
+    COPY target/myapp.jar /app/myapp.jar
+    # Expose port (e.g., 8080)
+    EXPOSE 8080
+    # Run the jar file
+    CMD ["java", "-jar", "/app/myapp.jar"]
+________________________________________
+🛠️ Using Custom Manually Created Base Images
+
+If you want to use your own custom base image (instead of official ones), here's how to do it:    
+    1. Build your custom base image first
+        Suppose you create a base image for your stack:
+        # My custom base image for Python
+        FROM ubuntu:20.04
+        RUN apt-get update && apt-get install -y python3 python3-pip
+        Build it:
+        docker build -t my-custom-python-base:1.0 .
+    
+    2. Use your custom base image in your app's Dockerfile
+    # Use your custom base image
+        FROM my-custom-python-base:1.0
+        WORKDIR /app
+        COPY requirements.txt .
+        RUN pip3 install --no-cache-dir -r requirements.txt
+        COPY . .
+        EXPOSE 5000
+        CMD ["python3", "app.py"]
+________________________________________
+🧠 Important notes when using custom base images
+
+    •	Tag your custom image properly (e.g., mybaseimage:v1).
+    •	If your custom base image is stored in a private registry, you may need to configure Docker login to pull it.
+    •	Custom base images let you pre-install tools or configure the environment your apps need, so you don’t repeat it in every app Dockerfile.
+________________________________________
+Bonus: Multi-Stage Builds (Advanced)
+
+To keep your images small, you can build in stages.
+
+Example: Java multi-stage
+    # Build stage
+    FROM maven:3.8.6-openjdk-17 AS build
+    WORKDIR /app
+    COPY pom.xml .
+    COPY src ./src
+    RUN mvn package -DskipTests
+    
+    # Run stage
+    FROM openjdk:17-jdk-slim
+    COPY --from=build /app/target/myapp.jar /app/myapp.jar
+    EXPOSE 8080
+    CMD ["java", "-jar", "/app/myapp.jar"]
+
