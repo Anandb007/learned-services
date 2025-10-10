@@ -1,3 +1,117 @@
+🐳 What is a Dockerfile?
+A Dockerfile is a text file that contains instructions used by Docker to build a Docker image. These instructions define everything needed to create and run a container — like the operating system, application code, dependencies, configurations, and commands.
+________________________________________
+📘 Basic Syntax of a Dockerfile
+    A Dockerfile is written in a line-by-line instruction format. Each line has a Dockerfile directive (command) and its corresponding arguments.
+    Here's the general structure:
+        INSTRUCTION arguments
+________________________________________
+✅ Mandatory Dockerfile Components
+    At minimum, to create a functional Docker image, a Dockerfile must include:
+    1.	FROM — defines base image
+    2.	CMD or ENTRYPOINT — defines what to run
+        Now, let's go step-by-step 👇
+________________________________________
+🔧 Step-by-Step Instructions
+________________________________________
+1. FROM — Base Image
+    •	Purpose: Sets the base image your Docker image builds upon.
+    •	Mandatory: ✅ YES
+    FROM ubuntu:20.04
+    •	You can use official images like ubuntu, node, python, etc.
+    •	You can use a custom image as a base.
+    •	Always specify the tag/version to avoid using the latest unknowingly.
+    📌 You can have multiple FROM statements in advanced scenarios (called multi-stage builds).
+________________________________________
+2. LABEL — Metadata
+    •	Purpose: Adds metadata (like maintainer, version).
+    •	Mandatory: ❌ NO
+    LABEL maintainer="yourname@example.com"
+    LABEL version="1.0"
+    Useful for identifying and documenting your image.
+________________________________________
+3. ENV — Environment Variables
+    •	Purpose: Sets environment variables.
+    •	Mandatory: ❌ NO
+    ENV APP_HOME=/usr/src/app
+    Helps to avoid hardcoding values. Can be used later in the Dockerfile as $APP_HOME.
+________________________________________
+4. WORKDIR — Working Directory
+    •	Purpose: Sets the working directory for subsequent instructions (RUN, CMD, COPY, etc.)
+    •	Mandatory: ❌ NO (but recommended)
+    WORKDIR /usr/src/app
+    Avoids using cd in RUN and makes the image more maintainable.
+________________________________________
+5. COPY / ADD — Adding Files
+    •	Purpose: Copies files from your host into the image.
+    •	Mandatory: ❌ NO (but needed to include app code)
+    COPY . .
+    # OR
+    COPY requirements.txt .
+    
+    # Optional:
+    # ADD myarchive.tar.gz /app/
+    ✅ Prefer COPY over ADD unless you need:
+    •	Remote URLs
+    •	Automatic extraction of .tar.gz files
+________________________________________
+6. RUN — Execute Commands During Build
+    •	Purpose: Executes commands at build time to modify the image.
+    •	Mandatory: ❌ NO (but usually used to install packages)
+    RUN apt-get update && apt-get install -y python3 python3-pip
+    RUN pip install -r requirements.txt
+    Each RUN creates a new layer in the image. Combine commands to reduce layers.
+________________________________________
+7. EXPOSE — Document Port
+    •	Purpose: Informs Docker which port the container will listen on.
+    •	Mandatory: ❌ NO
+    EXPOSE 5000
+    Does not actually open the port. It’s informational for people/tools.
+________________________________________
+8. CMD — Default Command
+    •	Purpose: Defines the default command to run when a container starts.
+    •	Mandatory: ✅ YES (or use ENTRYPOINT)
+    CMD ["python3", "app.py"]
+    •	Can be written as JSON array (exec form, recommended) or as a shell string:
+    CMD python3 app.py
+    📌 Only one CMD is allowed. Later ones override earlier.
+________________________________________
+9. ENTRYPOINT — Fixed Command
+    •	Purpose: Sets the main command, but allows additional arguments via CMD or CLI.
+    •	Mandatory: ❌ NO (but powerful)
+    ENTRYPOINT ["python3", "app.py"]
+    •	Combine with CMD to set default args:
+    ENTRYPOINT ["python3", "app.py"]
+    CMD ["--port", "5000"]
+    Now you can override CMD at runtime:
+    docker run myapp --port 8080
+________________________________________
+10. VOLUME — Define a mount point
+    •	Purpose: Declares a volume for persistent data.
+    •	Mandatory: ❌ NO
+    VOLUME /data
+    Useful for storing logs, DB data, etc.
+________________________________________
+11. USER — Set the user
+    •	Purpose: Switches from root to a less privileged user.
+    •	Mandatory: ❌ NO (but improves security)
+    USER appuser
+________________________________________
+12. ARG — Build-time Variables
+    •	Purpose: Pass variables at build time.
+    •	Mandatory: ❌ NO
+    ARG VERSION=1.0
+    RUN echo $VERSION
+    Pass values via:
+    docker build --build-arg VERSION=2.0 .
+________________________________________
+13. HEALTHCHECK — Container Health Check
+    •	Purpose: Tells Docker how to test if your app is healthy.
+    •	Mandatory: ❌ NO
+    HEALTHCHECK CMD curl --fail http://localhost:5000/health || exit 1
+
+________________________________________
+
 🚀 Dockerfiles for Different Stacks
 ________________________________________
 1️⃣ Python Dockerfile
