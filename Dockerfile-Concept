@@ -75,7 +75,6 @@ ________________________________________
 Bonus: Multi-Stage Builds (Advanced)
 
 To keep your images small, you can build in stages.
-
 Example: Java multi-stage
     # Build stage
     FROM maven:3.8.6-openjdk-17 AS build
@@ -89,4 +88,62 @@ Example: Java multi-stage
     COPY --from=build /app/target/myapp.jar /app/myapp.jar
     EXPOSE 8080
     CMD ["java", "-jar", "/app/myapp.jar"]
+
+
+_________________________________________
+🐳 Dockerfile for Nginx
+Basic Nginx Dockerfile — Installing from Official Image (Recommended way)
+Usually, you don’t install Nginx yourself in a base OS; you just start from the official Nginx image, which is slim and optimized.
+    # Start from official nginx image
+    FROM nginx:stable-alpine
+    # Copy your custom nginx config file (optional)
+    COPY nginx.conf /etc/nginx/nginx.conf
+    # Copy static content (optional)
+    COPY ./html /usr/share/nginx/html
+    # Expose port 80
+    EXPOSE 80
+    # Start Nginx (already configured in the base image CMD)
+    CMD ["nginx", "-g", "daemon off;"]
+________________________________________
+If you want to install Nginx yourself on a base OS (not recommended)
+    FROM ubuntu:22.04
+    # Install nginx
+    RUN apt-get update && apt-get install -y nginx \  && rm -rf /var/lib/apt/lists/*
+    # Copy your custom nginx config if needed
+    COPY nginx.conf /etc/nginx/nginx.conf
+    # Expose port 80
+    EXPOSE 80
+    # Run nginx in the foreground
+    CMD ["nginx", "-g", "daemon off;"]
+________________________________________
+🐳 Dockerfile for HAProxy
+Using Official HAProxy Image (Recommended)
+    FROM haproxy:2.8-alpine
+    # Copy custom haproxy config
+    COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+    # Expose ports (e.g., 80 and 443)
+    EXPOSE 80 443
+    # Run HAProxy (default CMD in the base image)
+    CMD ["haproxy", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
+________________________________________
+Installing HAProxy from a base OS (Ubuntu example)
+    FROM ubuntu:22.04
+    RUN apt-get update && apt-get install -y haproxy \ && rm -rf /var/lib/apt/lists/*
+    COPY haproxy.cfg /etc/haproxy/haproxy.cfg
+    EXPOSE 80 443
+    CMD ["haproxy", "-f", "/etc/haproxy/haproxy.cfg"]
+________________________________________
+🔑 Key Points
+    •	Always prefer official images like nginx, haproxy — they are optimized, smaller, and maintained.
+    •	Copy your custom config files into the image, replacing defaults.
+    •	Use EXPOSE for ports your proxy listens on.
+    •	Use CMD or rely on the base image’s default command to run the service in the foreground (daemon off for nginx).
+    •	Clean up package caches after installation to reduce image size (rm -rf /var/lib/apt/lists/*).
+________________________________________
+Example: Simple Nginx Dockerfile with custom config
+    FROM nginx:alpine
+    COPY nginx.conf /etc/nginx/nginx.conf
+    EXPOSE 80
+    CMD ["nginx", "-g", "daemon off;"]
+
 
