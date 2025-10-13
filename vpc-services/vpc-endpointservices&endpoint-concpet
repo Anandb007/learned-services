@@ -10,7 +10,7 @@ What is an Endpoint?
     Component                                        Description
     ENI (Elastic Network Interface)                  The actual network interface created inside your subnet to route traffic privately.
     Private DNS                                      DNS that resolves the service domain to the private IP of the Endpoint.
-    Route	                                           Traffic from your subnet routes through the Endpoint’s ENI to reach the target service privately
+    Route                                            Traffic from your subnet routes through the Endpoint’s ENI to reach the target service privately
 
 gateway emdpoint is only for dynamo and s3 buckets
   S3 and DynamoDB are global services (they operate across all AZs and regions)
