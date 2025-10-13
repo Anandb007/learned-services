@@ -30,19 +30,59 @@ What is an Endpoint Service?
     can create an Endpoint Service pointing to your NLB. Your customers create Interface Endpoints in their VPCs to connect to your service securely.
 
 🎯 Core Components:
-Component                           Description
-NLB	Network                         Load Balancer forwarding traffic to your app
-Endpoint                            Service	AWS object representing your service exposing NLB for PrivateLink
-Interface Endpoint                  Created by client VPCs to connect to your Endpoint Service
+    Component                           Description
+    NLB	Network                         Load Balancer forwarding traffic to your app
+    Endpoint                            Service	AWS object representing your service exposing NLB for PrivateLink
+    Interface Endpoint                  Created by client VPCs to connect to your Endpoint Service
 
-#####################################################
-### Difference Between Endpoint and Endpoint Service
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-| Topic              | Endpoint (Interface Endpoint)                                         | Endpoint Service                                                               |
-|--------------------|-----------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| Definition         | A network interface in your VPC that connects privately to a service. | A service you create to expose your own application privately via PrivateLink. |
-| Purpose            | Allows a VPC to privately access AWS or third-party services.         | Enables other VPCs/accounts to privately connect to your service.              |
-| Who creates it?    | Created by the service consumer inside their VPC.                     | Created by the service provider who owns the service.                          |
-| Function           | Acts as a client-side connection point for private access.            | Acts as the server-side endpoint that accepts private connections.             |
-| Connection target  | Connects to an AWS service or a custom Endpoint Service.              | Points to a Network Load Balancer that fronts your service.                    |
-| Traffic flow       | Initiates and sends requests privately over the AWS backbone.         | Receives requests and routes them to backend resources privately.              |
+________________________________________________________________________________
+
+What is AWS Service Lattice?
+
+AWS Service Lattice is a fully managed service mesh solution designed to simplify service-to-service communication for distributed applications running across various compute environments (like Amazon ECS, EKS, EC2, or Lambda). It helps developers and operators securely connect, observe, and control traffic between microservices without requiring them to manage the underlying infrastructure or implement complex networking logic.
+
+Core Concepts of Service Lattice
+    Concept	                            Description
+    Service Mesh	                    A dedicated infrastructure layer that controls service-to-service communication, providing observability, security, and traffic routing. AWS Service Lattice is Amazon’s managed service mesh.
+    Service Network	                    Logical boundary containing services that communicate with each other. It abstracts underlying networks and policies.
+    Service	                            Represents an application or microservice running somewhere (ECS, EKS, EC2, Lambda). Services register with the lattice and expose endpoints.
+    Service Discovery	                Service Lattice automatically discovers endpoints within the network and manages connectivity.
+    Traffic Routing & Control	        Operators define routing rules (e.g., retries, timeouts, weighted traffic distribution) to control how requests flow between services.
+    Security	                        Service Lattice enforces security policies (TLS encryption, authorization) transparently between services without changing application code.
+    Observability	                    Integrated metrics, distributed tracing, and logs for visibility into service interactions and performance.
+
+Key Benefits
+    Simplified connectivity: No need for custom networking, DNS hacks, or managing load balancers for each microservice.
+    Multi-environment:       Supports services running on multiple compute platforms inside AWS.
+    Secure by default:       Mutual TLS encryption and fine-grained authorization policies.
+    Centralized control:     Manage routing and security policies from a single control plane.
+    Fully managed:           No infrastructure to provision or maintain, reducing operational overhead.
+
+How Service Lattice Works — High-Level Flow
+
+    Define a service network —     This is a virtual space where all your services communicate.
+    Register your services —       Add your microservices running on ECS/EKS/EC2/Lambda to the network.
+    Configure routing policies —   Define how services communicate (e.g., failover, retries).
+    Deploy security policies —     Enable mutual TLS, service-level permissions.
+    Monitor traffic —              Use built-in telemetry for metrics and tracing.
+
+#######################################################################
+### Difference Between Endpoint, Endpoint Service, and Service Lattice
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Topic              | Endpoint (Interface Endpoint)                                         | Endpoint Service                                                               | Service Lattice                                                                                       |
+|--------------------|-----------------------------------------------------------------------|--------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| Definition         | A network interface in your VPC that connects privately to a service. | A service you create to expose your own application privately via PrivateLink. | A fully managed service mesh that simplifies and secures communication between multiple services.     |
+| Purpose            | Allows a VPC to privately access AWS or third-party services.         | Enables other VPCs/accounts to privately connect to your service.              | Centralizes and manages service-to-service communication across different compute environments.       |
+| Who creates it?    | Created by the service consumer inside their VPC.                     | Created by the service provider who owns the service.                          | Created and managed by the application/team owning the mesh to include all relevant services.         | 
+| Function           | Acts as a client-side connection point for private access.            | Acts as the server-side endpoint that accepts private connections.             | Provides service discovery, routing, security, and observability between microservices.               |
+| Connection target  | Connects to an AWS service or a custom Endpoint Service.              | Points to a Network Load Balancer that fronts your service.                    | Connects services running across ECS, EKS, Lambda, EC2 within a service network abstraction.          |
+| Traffic flow       | Initiates and sends requests privately over the AWS backbone.         | Receives requests and routes them to backend resources privately.              | Manages and controls traffic flow between services with advanced routing and security policies.       |
+
+
+
+Endpoint (Interface Endpoint):
+    A network interface inside your VPC that allows private communication to a specific service (like AWS services or third-party services) from within your VPC.
+Endpoint Service:
+    A service you expose privately to other AWS accounts or VPCs using PrivateLink, typically backed by a Network Load Balancer (NLB). This enables secure and private API/service communication across different AWS accounts or VPCs.
+AWS Service Lattice:
+    A managed service mesh that provides a centralized and simplified way to manage communication between multiple services across different AWS environments (ECS, EKS, Lambda, EC2), all in one place. It handles discovery, routing, security, and observability of service-to-service communication.
