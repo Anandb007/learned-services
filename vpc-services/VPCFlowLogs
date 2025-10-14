@@ -1,0 +1,61 @@
+AWS VPC Flow Logs
+________________________________________
+Overview
+VPC Flow Logs is an AWS feature that captures information about the IP traffic going to and from network interfaces in your Virtual Private Cloud (VPC). It enables monitoring, troubleshooting, and security analysis of network traffic in your AWS environment.
+________________________________________
+Key Concepts
+    Term	Description
+        VPC	A Virtual Private Cloud is a virtual network dedicated to your AWS account.
+        Network Interface (ENI)	A virtual network adapter attached to AWS resources like EC2 instances.
+        Flow Log Record	A single entry in the flow logs representing network traffic with fields like IP, port, protocol, etc.
+        Traffic Types	Categories of traffic captured — accepted, rejected, or all.
+________________________________________
+What Are VPC Flow Logs?
+    VPC Flow Logs record IP traffic flows through network interfaces (ENIs) in a VPC. This logging provides insight into:
+        •	Network traffic patterns
+        •	Security monitoring and anomaly detection
+        •	Troubleshooting connectivity or access issues
+        •	Auditing and compliance tracking
+________________________________________
+How VPC Flow Logs Work
+        •	Capture traffic at the network interface level.
+        •	Logs can be created for:
+        o	Individual network interfaces (ENIs)
+        o	Entire subnets
+        o	Entire VPCs
+        •	Capture inbound and outbound traffic.
+        •	Logs can be sent to:
+        o	CloudWatch Logs — for real-time monitoring and analysis.
+        o	S3 Bucket — for long-term storage and offline analysis.
+    ________________________________________
+Creating VPC Flow Logs
+    Using AWS Management Console
+        1.	Navigate to VPC > Flow Logs.
+        2.	Click Create flow log.
+        3.	Select the resource: VPC, subnet, or network interface.
+        4.	Choose the traffic type:
+          o	All — capture accepted and rejected traffic.
+          o	Accepted — capture only accepted traffic.
+          o	Rejected — capture only rejected traffic.
+        5.	Select a destination:
+          o	CloudWatch Logs group
+          o	S3 bucket
+        6.	Set permissions for VPC Flow Logs to publish logs.
+________________________________________
+Traffic Types
+    Traffic Type	Description
+        All	Logs both accepted and rejected traffic.
+        Accepted	Logs only accepted (allowed) traffic.
+        Rejected	Logs only rejected (denied) traffic.
+________________________________________
+Analyzing VPC Flow Logs
+    •	Use CloudWatch Logs Insights for querying and visualizing logs stored in CloudWatch.
+    •	Use AWS Athena to query flow logs stored in an S3 bucket.
+    •	Create CloudWatch Alarms to alert on specific network patterns.
+    •	Automate responses using AWS Lambda functions triggered by log events.
+________________________________________
+Use Cases
+    •	Security Monitoring: Detect unauthorized access attempts or unusual traffic.
+    •	Troubleshooting: Identify why traffic is blocked or why a service isn’t reachable.
+    •	Compliance: Keep an audit trail of network activity.
+    •	Performance Monitoring: Track traffic volumes and patterns for optimization.
