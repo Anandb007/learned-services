@@ -1,0 +1,184 @@
+Amazon EFS Integration with Kubernetes (EKS & Self-Hosted EC2)
+1. Introduction
+Amazon Elastic File System (EFS) is a fully managed file storage service that can be used with applications in the cloud. In Kubernetes, EFS provides shared storage that can be accessed across multiple pods, even if they run on different worker nodes.
+This document details the step-by-step integration of Amazon EFS with Kubernetes in two scenarios:
+•	Amazon EKS (Elastic Kubernetes Service): A managed Kubernetes service.
+•	Self-Hosted EC2 Kubernetes Cluster: A Kubernetes cluster set up on EC2 instances with both master and worker nodes managed by you.
+________________________________________
+2. Overview of EFS in Kubernetes
+What is Amazon EFS?
+•	Amazon Elastic File System (EFS) provides scalable, highly available, and durable file storage.
+•	EFS supports NFS (Network File System) protocols, making it ideal for shared file storage in distributed environments.
+•	In Kubernetes, EFS is used to provide Persistent Volumes (PVs) that are mounted into pods as shared storage.
+Why Use EFS with Kubernetes?
+•	Shared Storage: EFS allows multiple pods to access the same data concurrently, even across different nodes.
+•	Scalability: EFS automatically scales to accommodate increasing storage needs without manual intervention.
+•	High Availability and Durability: EFS is designed for 99.99% availability and durability.
+•	Persistent Storage: EFS ensures data persists even if pods or nodes are terminated.
+________________________________________
+3. Integrating EFS with Amazon EKS
+Step 1: Create an EFS File System
+1.	Login to AWS Console and navigate to EFS under the Storage section.
+2.	Create a File System:
+o	Choose the VPC where your EKS cluster resides.
+o	Select the appropriate Availability Zones.
+o	Set the Throughput Mode (Bursting for low usage, Provisioned for high and steady usage).
+3.	Set Security Groups to allow inbound NFS traffic (port 2049).
+Step 2: Install EFS CSI Driver on EKS
+1.	Deploy the EFS CSI Driver:
+o	Run the following command to deploy the driver in your EKS cluster:
+2.	kubectl apply -k github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/eks/ci/
+3.	Verify the Driver:
+o	Confirm the driver’s installation by checking the Kubernetes pods in the kube-system namespace:
+4.	kubectl get pods -n kube-system
+Step 3: Create Persistent Volume (PV) and Persistent Volume Claim (PVC)
+1.	Create PV:
+o	Define a Persistent Volume that points to the EFS file system, specifying the volume handle (EFS ID) and access mode.
+Example efs-pv.yaml:
+2.	apiVersion: v1
+3.	kind: PersistentVolume
+4.	metadata:
+5.	  name: efs-pv
+6.	spec:
+7.	  capacity:
+8.	    storage: 5Gi
+9.	  volumeMode: Filesystem
+10.	  accessModes:
+11.	    - ReadWriteMany
+12.	  persistentVolumeReclaimPolicy: Retain
+13.	  storageClassName: efs-sc
+14.	  csi:
+15.	    driver: efs.csi.aws.com
+16.	    volumeHandle: fs-12345678
+17.	Create PVC:
+o	Request storage from the PV using a Persistent Volume Claim.
+Example efs-pvc.yaml:
+18.	apiVersion: v1
+19.	kind: PersistentVolumeClaim
+20.	metadata:
+21.	  name: efs-pvc
+22.	spec:
+23.	  accessModes:
+24.	    - ReadWriteMany
+25.	  resources:
+26.	    requests:
+27.	      storage: 5Gi
+28.	  storageClassName: efs-sc
+Step 4: Use EFS in a Pod
+1.	Create Deployment:
+o	Deploy an application that mounts the PVC as a volume.
+Example efs-deployment.yaml:
+2.	apiVersion: apps/v1
+3.	kind: Deployment
+4.	metadata:
+5.	  name: efs-deployment
+6.	spec:
+7.	  replicas: 2
+8.	  selector:
+9.	    matchLabels:
+10.	      app: efs-app
+11.	  template:
+12.	    metadata:
+13.	      labels:
+14.	        app: efs-app
+15.	    spec:
+16.	      containers:
+17.	      - name: efs-app
+18.	        image: nginx
+19.	        volumeMounts:
+20.	        - mountPath: /usr/share/nginx/html
+21.	          name: efs-storage
+22.	      volumes:
+23.	      - name: efs-storage
+24.	        persistentVolumeClaim:
+25.	          claimName: efs-pvc
+26.	Verify Access:
+o	Verify that the application pods can access the EFS by executing into one of the pods:
+27.	kubectl exec -it <pod-name> -- /bin/bash
+28.	cd /usr/share/nginx/html
+29.	ls -l
+________________________________________
+4. Integrating EFS with Self-Hosted EC2 Kubernetes Cluster
+Step 1: Set Up EFS and Security Groups
+1.	Create an EFS file system in the same VPC as your EC2 instances.
+2.	Security Groups:
+o	Create a security group for the EFS file system that allows inbound NFS traffic (port 2049) from your EC2 worker nodes.
+Step 2: Install EFS CSI Driver
+1.	Deploy the EFS CSI driver in your self-hosted Kubernetes cluster:
+2.	kubectl apply -k github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/ci/
+Step 3: Create Persistent Volume (PV) and Persistent Volume Claim (PVC)
+1.	Create Persistent Volume (PV) to connect Kubernetes to the EFS file system.
+Example efs-pv.yaml:
+2.	apiVersion: v1
+3.	kind: PersistentVolume
+4.	metadata:
+5.	  name: efs-pv
+6.	spec:
+7.	  capacity:
+8.	    storage: 5Gi
+9.	  volumeMode: Filesystem
+10.	  accessModes:
+11.	    - ReadWriteMany
+12.	  persistentVolumeReclaimPolicy: Retain
+13.	  storageClassName: efs-sc
+14.	  csi:
+15.	    driver: efs.csi.aws.com
+16.	    volumeHandle: fs-12345678
+17.	Create PVC to request the EFS storage.
+Example efs-pvc.yaml:
+18.	apiVersion: v1
+19.	kind: PersistentVolumeClaim
+20.	metadata:
+21.	  name: efs-pvc
+22.	spec:
+23.	  accessModes:
+24.	    - ReadWriteMany
+25.	  resources:
+26.	    requests:
+27.	      storage: 5Gi
+28.	  storageClassName: efs-sc
+Step 4: Use EFS in a Pod
+1.	Create Deployment with the EFS PVC.
+Example efs-deployment.yaml:
+2.	apiVersion: apps/v1
+3.	kind: Deployment
+4.	metadata:
+5.	  name: efs-deployment
+6.	spec:
+7.	  replicas: 2
+8.	  selector:
+9.	    matchLabels:
+10.	      app: efs-app
+11.	  template:
+12.	    metadata:
+13.	      labels:
+14.	        app: efs-app
+15.	    spec:
+16.	      containers:
+17.	      - name: efs-app
+18.	        image: nginx
+19.	        volumeMounts:
+20.	        - mountPath: /usr/share/nginx/html
+21.	          name: efs-storage
+22.	      volumes:
+23.	      - name: efs-storage
+24.	        persistentVolumeClaim:
+25.	          claimName: efs-pvc
+26.	Verify Pod Access:
+o	Check if the pods can access the EFS file system and read/write data to the mounted directory.
+________________________________________
+5. Differences Between EKS and Self-Hosted EC2 Kubernetes Clusters
+EKS
+•	Managed Service: AWS handles infrastructure management (master node, scaling, etc.).
+•	Simplified Networking: EKS is integrated with AWS networking and IAM.
+•	EFS Integration: EKS is seamlessly integrated with other AWS services, like EFS, simplifying setup.
+Self-Hosted EC2 Kubernetes
+•	Full Control: You manage the entire cluster, including worker nodes and master node.
+•	Custom Networking: You handle VPC setup, subnet configuration, and routing.
+•	EFS Setup: Requires manual configuration of NFS access between EC2 instances and EFS.
+________________________________________
+6. Benefits of EFS in Kubernetes
+•	Shared Persistent Storage: EFS allows multiple pods across different nodes to share the same data.
+•	Scalable: EFS scales automatically as your data storage needs grow.
+•	Highly Available and Durable: AWS ensures EFS has high availability and durability across Availability Zones.
+•	No Management Overhead: EFS removes the need to manage complex file storage infrastructure.
