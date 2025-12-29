@@ -1,0 +1,203 @@
+🐳 Docker Networking & Commands – Complete Document
+1️⃣ Introduction to Docker Networking
+
+Docker networking enables containers to communicate with:
+
+    Other containers
+    
+    The Docker host
+    
+    External systems (internet)
+
+Each container runs in an isolated network namespace and Docker provides virtual networks to connect them.
+
+2️⃣ Core Docker Networking Concepts
+🔹 Container Networking
+
+    Each container gets:
+    
+        Its own IP address
+        
+        Its own network stack
+    
+    Containers are isolated by default
+
+🔹 Network
+
+    A virtual switch
+    
+    Containers connected to the same network can communicate
+    
+    Communication happens via container name (DNS)
+
+🔹 Port Mapping
+
+    Maps a container’s internal port to the host machine.
+    
+    docker run -p 8080:80 nginx
+    
+    Host Port 8080 → Container Port 80
+
+3️⃣ Types of Docker Networks
+
+Docker provides 5 main network drivers.
+
+1. Bridge Network (Default)
+    Most commonly used
+    Containers get private IPs
+    Containers can talk to each other
+    Uses NAT to communicate with host
+    docker network create my-bridge
+    docker run --network my-bridge nginx
+      
+    Use cases
+      Microservices
+      Web applications
+      Local development
+
+2. Host Network
+
+    Container shares host’s network
+    No isolation
+    Faster performance
+    docker run --network host nginx
+
+
+Pros
+    No port mapping required
+
+Cons
+    Port conflicts
+    Less secure
+
+3. None Network
+    No networking at all
+    Completely isolated container   
+    docker run --network none alpine
+
+
+Use cases
+    Security testing   
+    Offline batch jobs
+
+4. Overlay Network (Swarm)
+    Used for multi-host communication
+    Requires Docker Swarm
+
+docker network create -d overlay my-overlay
+
+Use cases:
+    Distributed systems  
+    Clustered applications
+_____________________________________________________________________________________
+
+4️⃣ Docker Networking Commands
+docker network ls
+docker network inspect bridge
+docker network create my-network
+docker network rm my-network
+
+5️⃣ EXPOSE vs -p (Port Publishing)
+🔹 EXPOSE
+
+Dockerfile instruction
+
+Documents which port the container listens on
+
+Does NOT open the port
+
+EXPOSE 8080
+
+
+✔ Internal container communication
+❌ No external access
+
+🔹 -p or --publish
+
+Runtime option
+
+Maps container port to host port
+
+Allows external access
+
+docker run -p 8080:80 nginx
+
+
+✔ External access
+✔ Host → Container traffic
+
+🔥 Difference Summary
+Feature	EXPOSE	-p
+Where used	Dockerfile	docker run
+Opens port externally	❌ No	✅ Yes
+Documentation	✅ Yes	❌ No
+Required	❌ No	❌ No
+Interview Answer
+
+EXPOSE documents container ports, while -p publishes and maps them to the host.
+
+6️⃣ Multiple Dockerfiles in One Folder
+Folder Structure
+project/
+├── Dockerfile.app1
+├── Dockerfile.app2
+
+Build Images
+docker build -f Dockerfile.app1 -t app1-image .
+docker build -f Dockerfile.app2 -t app2-image .
+
+Run Containers
+docker run -d --name app1 app1-image
+docker run -d --name app2 app2-image
+
+7️⃣ Meaning of -f and -t
+🔹 -f (File)
+
+Specifies which Dockerfile to use
+
+docker build -f Dockerfile.custom .
+
+🔹 -t (Tag)
+
+Assigns name and version to the image
+
+docker build -t my-app:1.0 .
+
+8️⃣ Docker Commands Cheat Sheet (Beginner → Advanced)
+Basics
+docker --version
+docker info
+
+Images
+docker images
+docker pull nginx
+docker build -t my-image .
+docker rmi image_id
+
+Containers
+docker run nginx
+docker run -d nginx
+docker ps
+docker ps -a
+docker stop container_id
+docker rm container_id
+
+Logs & Debugging
+docker logs container_id
+docker exec -it container_id bash
+docker inspect container_id
+
+Volumes
+docker volume create my-volume
+docker run -v my-volume:/data nginx
+docker volume ls
+
+Networking
+docker network ls
+docker network create app-net
+docker run --network app-net nginx
+
+Cleanup
+docker system prune
+docker container prune
+docker image prune
