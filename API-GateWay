@@ -1,31 +1,20 @@
 1. Introduction
-
-Amazon API Gateway is a fully managed AWS service that allows you to create, publish, secure, monitor, and scale APIs.
-It acts as the entry point (front door) for backend services such as AWS Lambda, HTTP services, and other AWS services.
-
-API Gateway is widely used in serverless architectures.
+ Amazon API Gateway is a fully managed AWS service that allows you to create, publish, secure, monitor, and scale APIs.
+ It acts as the entry point (front door) for backend services such as AWS Lambda, HTTP services, and other AWS services.
+ 
+ API Gateway is widely used in serverless architectures.
 
 2. Why API Gateway Exists
-
-Without API Gateway:
-
-Backend services would be exposed directly
-
-You would need to build authentication, authorization, throttling, and logging manually
-
-Scaling and security would be complex
-
-API Gateway solves:
-
-Secure API exposure
-
-Traffic management
-
-Authentication & authorization
-
-Monitoring and observability
-
-Seamless AWS integration
+ Without API Gateway:
+ Backend services would be exposed directly
+ You would need to build authentication, authorization, throttling, and logging manually
+ Scaling and security would be complex
+ API Gateway solves:
+ Secure API exposure
+ Traffic management
+ Authentication & authorization
+ Monitoring and observability 
+ Seamless AWS integration
 
 3. High-Level Architecture
 Client
@@ -33,104 +22,67 @@ Client
  → Backend (Lambda / HTTP / AWS Service)
  → API Gateway
  → Client
-
-
-API Gateway sits between clients and backend services.
+ API Gateway sits between clients and backend services.
 
 4. Types of API Gateway APIs
 4.1 REST API
-
-Feature-rich
-
-Supports request/response mapping
-
-Higher cost and latency
+ Feature-rich
+ Supports request/response mapping
+ Higher cost and latency
 
 Use cases:
-
-Complex transformations
-
-API keys & usage plans
-
-Legacy systems
+  Complex transformations
+  API keys & usage plans 
+  Legacy systems
 
 4.2 HTTP API (Recommended)
-
-Lower latency
-
-~70% cheaper than REST API
-
-Limited features
+ Lower latency
+ ~70% cheaper than REST API
+ Limited features
 
 Use cases:
-
-Lambda proxy integrations
-
-Microservices
-
-Modern serverless apps
+ Lambda proxy integrations
+ Microservices
+ Modern serverless apps
 
 4.3 WebSocket API
-
-Full-duplex communication
-
-Persistent connections
-
+ Full-duplex communication
+ Persistent connections
 Use cases:
-
-Chat applications
-
-Live notifications
-
-Real-time dashboards
+ Chat applications
+ Live notifications
+ Real-time dashboards
 
 5. Endpoint Types
-Edge-Optimized
+ Edge-Optimized
+ Uses CloudFront automatically
+ Best for global users
 
-Uses CloudFront automatically
-
-Best for global users
-
-Regional
-
-Stays in one AWS region
-
-Can be combined with custom CloudFront
-
-Private
-
-Accessible only via VPC endpoints
-
-No public internet access
+ Regional
+ Stays in one AWS region
+ Can be combined with custom CloudFront
+ 
+ Private
+ Accessible only via VPC endpoints
+ No public internet access
 
 6. Core Components
-Resources
-
-Logical API paths:
-
-/users
-/users/{id}
-
-Methods
-
-HTTP verbs:
-
-GET
-
-POST
-
-PUT
-
-DELETE
+ Resources
+ Logical API paths:
+ /users
+ /users/{id}
+ 
+Methods 
+ HTTP verbs:
+ GET
+ POST
+ PUT
+ DELETE
 
 Stages
-
 Environment-specific deployments:
-
 dev
-
 staging
-
 prod
 
 7. Request Lifecycle (Internal Flow)
@@ -145,117 +97,74 @@ Client
  → Backend Integration
  → Response Mapping
  → Client
-
-
-Failures can occur at any stage.
+ Failures can occur at any stage.
 
 8. Integration Types
-
-API Gateway integrates with:
-
-AWS Lambda
-
-HTTP endpoints
-
-AWS services (DynamoDB, SQS, SNS)
+  API Gateway integrates with:
+  AWS Lambda
+  HTTP endpoints
+  AWS services (DynamoDB, SQS, SNS)
 
 Integration modes:
-
-Lambda Proxy Integration
-
-Lambda Non-Proxy Integration
-
-AWS Service Integration
+ Lambda Proxy Integration 
+ Lambda Non-Proxy Integration
+ AWS Service Integration
 
 9. Lambda Proxy vs Non-Proxy Integration
-Lambda Proxy Integration
-
-Full HTTP request forwarded to Lambda
-
-Lambda returns full HTTP response
+ Lambda Proxy Integration
+ Full HTTP request forwarded to Lambda
+ Lambda returns full HTTP response
 
 Pros:
-
 Simple
-
 Easy debugging
-
 Less configuration
 
 Cons:
-
 Lambda must handle HTTP logic
-
 Default and recommended option
 
 Lambda Non-Proxy Integration
-
-API Gateway transforms requests using mapping templates
-
-Lambda receives custom payload
+ API Gateway transforms requests using mapping templates
+ Lambda receives custom payload
 
 Pros:
-
-Fine-grained control
+ Fine-grained control
 
 Cons:
-
-Complex
-
-Hard to debug
-
-Slower
-
+ Complex
+ Hard to debug
+ Slower
 Use only when necessary
 
 10. Authentication & Authorization
 Supported Methods
-
-IAM Authentication
-
-Cognito User Pools
-
-Lambda Authorizers
-
-API Keys (metering only)
-
+ IAM Authentication
+ Cognito User Pools
+ Lambda Authorizers
+ API Keys (metering only)
 Best Practice
-
-Cognito for user-based auth
-
-IAM for service-to-service calls
+ Cognito for user-based auth
+ IAM for service-to-service calls
 
 11. Throttling & Rate Limiting
-
-Default regional limit: ~10,000 RPS
-
-Burst capacity: ~5,000
-
+ Default regional limit: ~10,000 RPS
+ Burst capacity: ~5,000
 Configurable at:
-
-API level
-
-Stage level
-
-Method level
-
-Returns 429 Too Many Requests when exceeded.
+ API level
+ Stage level
+ Method level
+ Returns 429 Too Many Requests when exceeded.
 
 12. Request Validation
-
 API Gateway can validate:
-
-Headers
-
-Query parameters
-
-Request body (JSON schema)
+ Headers
+ Query parameters
+ Request body (JSON schema)
 
 Benefits:
-
-Blocks invalid requests early
-
-Reduces backend cost
+ Blocks invalid requests early
+ Reduces backend cost
 
 13. Caching
 API Gateway Cache
