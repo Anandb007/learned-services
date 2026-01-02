@@ -1,0 +1,100 @@
+Docker System & Info
+_____________________________________________________________
+| Command            | Purpose                              |
+| ------------------ | ------------------------------------ |
+| `docker version`   | Show Docker client & server versions |
+| `docker info`      | Docker daemon & system info          |
+| `docker system df` | Disk usage by Docker                 |
+| `docker stats`     | Real-time container resource usage   |
+
+
+Image Management
+_______________________________________________
+| Command                  | Purpose           |
+| ------------------------ | ----------------- |
+| `docker images`          | List local images |
+| `docker pull <image>`    | Download image    |
+| `docker build -t name .` | Build image       |
+| `docker rmi <image>`     | Remove image      |
+| `docker tag`             | Tag an image      |
+
+
+Container Lifecycle
+_______________________________________________
+| Command          | Purpose                  |
+| ---------------- | ------------------------ |
+| `docker run`     | Create + start container |
+| `docker create`  | Create container only    |
+| `docker start`   | Start container          |
+| `docker stop`    | Graceful stop            |
+| `docker kill`    | Force stop               |
+| `docker restart` | Restart container        |
+| `docker rm`      | Remove container         |
+
+
+Container Inspection & Logs
+______________________________________________
+| Command               | Purpose            |
+| --------------------- | ------------------ |
+| `docker ps`           | Running containers |
+| `docker ps -a`        | All containers     |
+| `docker logs <id>`    | View logs          |
+| `docker inspect <id>` | Detailed metadata  |
+| `docker top <id>`     | Running processes  |
+
+
+Execute Commands Inside Container
+__________________________________________________
+| Command         | Purpose                      |
+| --------------- | ---------------------------- |
+| `docker exec`   | Run command inside container |
+| `docker attach` | Attach to STDOUT             |
+
+
+Networking
+________________________________________________
+| Command                  | Purpose           |
+| ------------------------ | ----------------- |
+| `docker network ls`      | List networks     |
+| `docker network create`  | Create network    |
+| `docker network inspect` | Inspect network   |
+| `docker network connect` | Connect container |
+
+
+Volumes & Storage
+____________________________________________
+| Command                 | Purpose        |
+| ----------------------- | -------------- |
+| `docker volume ls`      | List volumes   |
+| `docker volume create`  | Create volume  |
+| `docker volume inspect` | Inspect volume |
+| `docker volume rm`      | Remove volume  |
+
+Cleanup & Maintenance
+________________________________________________________
+| Command                  | Purpose                   |
+| ------------------------ | ------------------------- |
+| `docker system prune`    | Clean unused resources    |
+| `docker container prune` | Remove stopped containers |
+| `docker image prune`     | Remove dangling images    |
+| `docker volume prune`    | Remove unused volumes     |
+
+
+Docker Commit & Save
+________________________________________
+| Command         | Purpose             |
+| --------------- | ------------------- |
+| `docker commit` | Container → Image   |
+| `docker save`   | Save image to tar   |
+| `docker load`   | Load image from tar |
+
+
+Docker Compose
+_________________________________________
+| Command               | Purpose        |
+| --------------------- | -------------- |
+| `docker-compose up`   | Start services |
+| `docker-compose down` | Stop services  |
+| `docker-compose ps`   | List services  |
+| `docker-compose logs` | View logs      |
+__________________________________________
