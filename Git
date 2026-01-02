@@ -1,0 +1,80 @@
+Basic Git Questions
+| Question                                 | Explanation                                                                                | Command / Example         |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------- |
+| **What is Git?**                         | A distributed version control system to track changes in code.                             | -                         |
+| **Difference between Git and GitHub?**   | Git: version control tool; GitHub: cloud platform to host Git repos.                       | -                         |
+| **What is a repository?**                | A project folder tracked by Git.                                                           | -                         |
+| **What is a commit?**                    | Snapshot of changes saved in repo.                                                         | `git commit -m "message"` |
+| **What is a branch?**                    | A separate line of development.                                                            | `git branch feature`      |
+| **Default branch in Git?**               | Usually `main` (or `master`).                                                              | -                         |
+| **git init**                             | Initialize a new Git repository.                                                           | `git init`                |
+| **git status**                           | Shows current file states: modified, staged, untracked.                                    | `git status`              |
+| **git add**                              | Moves changes to the staging area.                                                         | `git add file.txt`        |
+| **git add . vs git add -A**              | `.` → current folder; `-A` → all changes incl. deletions                                   | -                         |
+| **git commit**                           | Saves staged changes to repository.                                                        | `git commit -m "message"` |
+| **git clone**                            | Creates local copy of remote repo.                                                         | `git clone <url>`         |
+| **.gitignore**                           | Lists files/folders Git should ignore.                                                     | -                         |
+| **git log**                              | Shows commit history.                                                                      | `git log`                 |
+| **Working dir vs Staging vs Repository** | Working dir → files you edit; Staging → changes prepared for commit; Repo → saved commits. | -                         |
+
+
+Intermediate Git Questions
+| Question                        | Explanation                                                                     | Command / Example                                          |
+| ------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| **git fetch vs git pull**       | Fetch → download updates; Pull → fetch + merge.                                 | `git fetch` / `git pull`                                   |
+| **Merge conflict**              | When Git cannot auto-merge changes.                                             | Resolve manually, then `git add .` & `git commit`          |
+| **git merge**                   | Combines changes from another branch.                                           | `git merge feature`                                        |
+| **Fast-forward merge**          | Branch pointer moves forward (no merge commit).                                 | -                                                          |
+| **Three-way merge**             | Git merges using common ancestor → creates merge commit.                        | -                                                          |
+| **git rebase**                  | Re-applies commits on top of another branch for linear history.                 | `git rebase main`                                          |
+| **Merge vs Rebase**             | Merge → preserves history; Rebase → linear history, rewrites commits.           | -                                                          |
+| **git stash**                   | Temporarily saves uncommitted changes.                                          | `git stash`                                                |
+| **Apply stash**                 | Restore stashed changes.                                                        | `git stash apply` / `git stash pop`                        |
+| **git cherry-pick**             | Apply a specific commit from another branch.                                    | `git cherry-pick <commit-id>`                              |
+| **Detached HEAD**               | HEAD points to commit, not a branch.                                            | -                                                          |
+| **HEAD**                        | Pointer to current branch/commit.                                               | -                                                          |
+| **Rename branch**               | Change branch name.                                                             | `git branch -m old new`                                    |
+| **Delete local/remote branch**  | Remove branches safely.                                                         | `git branch -d <name>` / `git push origin --delete <name>` |
+| **git reset vs git revert**     | Reset → move HEAD, rewrite history; Revert → create new commit to undo changes. | -                                                          |
+| **git reset --soft/mixed/hard** | Soft → keeps staged; Mixed → keeps unstaged; Hard → deletes all changes.        | -                                                          |
+| **Undo last commit**            | -                                                                               | `git reset --soft HEAD~1` / `git revert HEAD`              |
+| **git diff**                    | Shows differences between commits/files.                                        | `git diff`                                                 |
+| **Tags in Git**                 | Mark specific points, usually releases.                                         | `git tag -a v1.0 -m "Release"`                             |
+
+
+Advanced Git Questions
+| Question                                 | Explanation                                                                      | Command / Example                                           |
+| ---------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| **Git object model**                     | Git stores everything as objects: blob, tree, commit, tag.                       | -                                                           |
+| **Types of objects**                     | Blob → file, Tree → folder, Commit → snapshot, Tag → pointer to commit           | -                                                           |
+| **Lightweight vs Annotated tags**        | Lightweight → name only; Annotated → includes metadata, recommended for releases | `git tag -a v1.0 -m "Release"`                              |
+| **How Git stores data**                  | Snapshots (not diffs), stored in `.git/objects`, each has SHA-1 hash             | -                                                           |
+| **Reflog**                               | Tracks all movements of HEAD; useful for recovery.                               | `git reflog`                                                |
+| **Recover deleted branch**               | Use reflog to find last commit → recreate branch                                 | `git checkout -b branch <commit-id>`                        |
+| **git bisect**                           | Binary search to find bug-introducing commit                                     | `git bisect start / git bisect good/bad / git bisect reset` |
+| **Squash commits**                       | Combine multiple commits into one                                                | `git rebase -i HEAD~3`                                      |
+| **git pull vs git pull --rebase**        | Pull → fetch + merge; Pull --rebase → fetch + reapply commits linearly           | -                                                           |
+| **Submodule**                            | Repo inside a repo; tracks commits separately                                    | -                                                           |
+| **Subtree**                              | Merges another repo inside your repo; easier to manage than submodule            | -                                                           |
+| **Change commit history**                | Interactive rebase                                                               | `git rebase -i HEAD~3`                                      |
+| **git blame**                            | Shows who changed each line                                                      | `git blame file.txt`                                        |
+| **Handling large files**                 | Git LFS tracks large files outside repo                                          | `git lfs track "*.psd"`                                     |
+| **Git LFS**                              | Large File Storage, stores pointer in Git                                        | -                                                           |
+| **Git hooks**                            | Scripts that run at events (pre-commit, post-commit)                             | `.git/hooks/pre-commit`                                     |
+| **Resolve conflicts during rebase**      | Fix conflicts → `git add` → `git rebase --continue`                              | `git rebase --abort` to cancel                              |
+| **Origin vs Upstream**                   | Origin → your fork; Upstream → original repo                                     | -                                                           |
+| **Revert merge commit**                  | Undo a merge safely                                                              | `git revert -m 1 <merge-commit-id>`                         |
+| **Avoid merge conflicts**                | Pull/rebase often, communicate, use feature branches                             | -                                                           |
+| **Git workflows**                        | Git Flow, Trunk-Based, Feature Branch                                            | -                                                           |
+| **Git worktree**                         | Multiple branches checked out in separate folders                                | `git worktree add ../feature feature`                       |
+| **git fetch --all vs git remote update** | Fetch all remotes; remote update updates references                              | -                                                           |
+| **Handle hotfixes**                      | Create hotfix branch from main, fix, merge back to main & develop                | -                                                           |
+
+Bonus: Scenario-Based Questions
+| Scenario                      | Solution / Command                                                                          |
+| ----------------------------- | ------------------------------------------------------------------------------------------- |
+| Committed secrets             | `git filter-repo --path secret.txt --invert-paths` (force push) or `git reset HEAD~1`       |
+| Move commit to another branch | `git checkout feature && git cherry-pick <commit-id>`                                       |
+| Undo pushed commit safely     | `git revert <commit-id> && git push origin main`                                            |
+| Deleted branch accidentally   | `git reflog` → `git checkout -b <branch> <commit-id>`                                       |
+| Clean up old branches         | `git branch --merged main` → `git branch -d <branch>` → `git push origin --delete <branch>` |
