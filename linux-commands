@@ -1,0 +1,261 @@
+# Linux Cheat Sheet & Troubleshooting Guide
+
+## Basic Navigation
+
+| Command | Description             | Example        |
+| ------- | ----------------------- | -------------- |
+| pwd     | Print working directory | pwd            |
+| ls      | List files              | ls -l          |
+| cd      | Change directory        | cd /var/log    |
+| mkdir   | Create directory        | mkdir mydir    |
+| rmdir   | Remove empty dir        | rmdir olddir   |
+| touch   | Create file             | touch a.txt    |
+| cp      | Copy                    | cp a.txt b.txt |
+| mv      | Move/Rename             | mv a.txt /tmp  |
+| rm      | Delete                  | rm a.txt       |
+| cat     | View file               | cat file.txt   |
+
+## File Viewing & Search
+
+| head | First lines | head -n 10 file |
+| tail | Last lines | tail -f logfile |
+| less | Scroll view | less file |
+| grep | Search text | grep error log |
+| wc | Count | wc -l file |
+| find | Search file | find / -name file |
+| locate | Fast search | locate nginx.conf |
+
+
+## Permissions & Ownership
+___________________________________________________
+| chmod | Change permission | chmod 755 file |
+| chown | Change owner | chown user:group file |
+| chgrp | Change group | chgrp dev file |
+| umask | Default mask | umask 022 |
+
+## System Monitoring
+___________________________________________________
+| top | CPU monitor | top |
+| htop | Enhanced top | htop |
+| ps | Process list | ps aux |
+| kill | Kill process | kill -9 PID |
+| free | RAM usage | free -h |
+| df | Disk usage | df -h |
+| du | Folder size | du -sh /var |
+| uptime | Load avg | uptime |
+
+## Networking
+__________________________________________________
+| ping | Connectivity | ping google.com |
+| curl | API call | curl url |
+| wget | Download | wget url |
+| ifconfig | Interface | ifconfig |
+| ip a | IP info | ip addr show |
+| netstat | Ports | netstat -tulpn |
+| ss | Modern netstat | ss -tulpn |
+| scp | Secure copy | scp file user@ip:/path |
+| ssh | Login | ssh user@ip |
+
+## Archive & Compression
+________________________________________________
+| tar -cvf | Create tar | tar -cvf b.tar dir |
+| tar -xvf | Extract | tar -xvf b.tar |
+| gzip | Compress | gzip file |
+| gunzip | Decompress | gunzip file.gz |
+| zip | Zip | zip files.zip * |
+| unzip | Extract zip | unzip files.zip |
+
+## User Management
+_______________________________________________
+| useradd | Add user | useradd anand |
+| passwd | Set password | passwd anand |
+| usermod | Modify user | usermod -aG sudo anand |
+| userdel | Delete user | userdel anand |
+| groupadd | Add group | groupadd dev |
+| id | User info | id anand |
+
+## Service Management (systemd)
+______________________________________________
+| systemctl start nginx |
+| systemctl stop nginx |
+| systemctl restart nginx |
+| systemctl status nginx |
+| systemctl enable nginx |
+| systemctl disable nginx |
+
+
+## Package Management
+### Debian/Ubuntu
+______________________________________________
+apt update
+apt install nginx
+apt remove nginx
+apt purge nginx
+
+### RHEL/CentOS/Amazon
+_____________________________________________
+yum install httpd
+yum update
+yum remove httpd
+
+## Advanced
+____________________________________________
+| Pipe | ls -l | grep log |
+| Redirect | echo hi > file |
+| Append | echo hi >> file |
+| Cron | crontab -e |
+| SSH keygen | ssh-keygen |
+| Copy key | ssh-copy-id user@host |
+| Firewall UFW | ufw allow 22 |
+| Firewall-cmd | firewall-cmd --add-port=80/tcp --permanent |
+| Disk list | lsblk |
+| Mount | mount /dev/sdb1 /mnt |
+| Umount | umount /mnt |
+
+## Docker
+___________________________________________
+| docker ps |
+| docker images |
+| docker run -d nginx |
+| docker logs id |
+
+
+## CPU & Memory Troubleshooting
+### Identify High CPU
+__________________________________________
+1. top (press P)
+2. Note PID
+3. ps -p PID -o pid,cmd,%cpu,%mem
+
+### Identify High Memory
+_________________________________________
+ps aux --sort=-%mem | head
+
+### Detailed Memory
+_________________________________________
+pmap -x PID
+cat /proc/PID/status
+
+### Thread CPU
+_________________________________________
+top -H -p PID
+
+### Kill Process
+
+kill PID
+kill -9 PID
+
+# Command Examples
+
+## Basic Navigation Examples
+
+pwd
+ls -l
+cd /var/log
+mkdir testdir
+rmdir olddir
+touch demo.txt
+cp demo.txt demo2.txt
+mv demo2.txt /tmp
+rm demo.txt
+cat /etc/hosts
+
+## File Viewing & Search Examples
+
+head -n 5 /etc/passwd
+tail -f /var/log/syslog
+less /etc/services
+grep root /etc/passwd
+wc -l /etc/passwd
+find / -name passwd
+locate nginx.conf
+
+## Permissions Examples
+
+chmod 755 script.sh
+chown root:root script.sh
+chgrp root script.sh
+umask 022
+
+## System Monitoring Examples
+
+top
+htop
+ps aux
+kill -9 1234
+free -h
+df -h
+du -sh /var
+uptime
+
+## Networking Examples
+
+ping google.com
+curl [https://example.com](https://example.com)
+wget [https://example.com/index.html](https://example.com/index.html)
+ifconfig
+ip a
+netstat -tulpn
+ss -tulpn
+scp file.txt user@1.1.1.1:/tmp
+ssh user@1.1.1.1
+
+## Archive Examples
+
+tar -cvf backup.tar /etc
+tar -xvf backup.tar
+gzip demo.txt
+gunzip demo.txt.gz
+zip test.zip *.txt
+unzip test.zip
+
+## User Management Examples
+
+useradd testuser
+passwd testuser
+usermod -aG sudo testuser
+userdel testuser
+groupadd dev
+id testuser
+
+## Service Management Examples
+
+systemctl start nginx
+systemctl stop nginx
+systemctl restart nginx
+systemctl status nginx
+systemctl enable nginx
+systemctl disable nginx
+
+## Package Examples
+
+apt install nginx
+yum install httpd
+
+## Advanced Examples
+
+ls -l | grep log
+echo hello > a.txt
+echo hi >> a.txt
+crontab -e
+ssh-keygen
+ssh-copy-id user@host
+ufw allow 22
+firewall-cmd --add-port=80/tcp --permanent
+lsblk
+mount /dev/sdb1 /mnt
+umount /mnt
+
+## Docker Examples
+
+docker ps
+docker images
+docker run -d nginx
+docker logs containerid
+
+## Git Examples
+
+git clone repo
+git pull
+git commit -m "msg"
+git push
