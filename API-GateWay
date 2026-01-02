@@ -1,0 +1,435 @@
+1. Introduction
+
+Amazon API Gateway is a fully managed AWS service that allows you to create, publish, secure, monitor, and scale APIs.
+It acts as the entry point (front door) for backend services such as AWS Lambda, HTTP services, and other AWS services.
+
+API Gateway is widely used in serverless architectures.
+
+2. Why API Gateway Exists
+
+Without API Gateway:
+
+Backend services would be exposed directly
+
+You would need to build authentication, authorization, throttling, and logging manually
+
+Scaling and security would be complex
+
+API Gateway solves:
+
+Secure API exposure
+
+Traffic management
+
+Authentication & authorization
+
+Monitoring and observability
+
+Seamless AWS integration
+
+3. High-Level Architecture
+Client
+ → API Gateway
+ → Backend (Lambda / HTTP / AWS Service)
+ → API Gateway
+ → Client
+
+
+API Gateway sits between clients and backend services.
+
+4. Types of API Gateway APIs
+4.1 REST API
+
+Feature-rich
+
+Supports request/response mapping
+
+Higher cost and latency
+
+Use cases:
+
+Complex transformations
+
+API keys & usage plans
+
+Legacy systems
+
+4.2 HTTP API (Recommended)
+
+Lower latency
+
+~70% cheaper than REST API
+
+Limited features
+
+Use cases:
+
+Lambda proxy integrations
+
+Microservices
+
+Modern serverless apps
+
+4.3 WebSocket API
+
+Full-duplex communication
+
+Persistent connections
+
+Use cases:
+
+Chat applications
+
+Live notifications
+
+Real-time dashboards
+
+5. Endpoint Types
+Edge-Optimized
+
+Uses CloudFront automatically
+
+Best for global users
+
+Regional
+
+Stays in one AWS region
+
+Can be combined with custom CloudFront
+
+Private
+
+Accessible only via VPC endpoints
+
+No public internet access
+
+6. Core Components
+Resources
+
+Logical API paths:
+
+/users
+/users/{id}
+
+Methods
+
+HTTP verbs:
+
+GET
+
+POST
+
+PUT
+
+DELETE
+
+Stages
+
+Environment-specific deployments:
+
+dev
+
+staging
+
+prod
+
+7. Request Lifecycle (Internal Flow)
+Client
+ → DNS / CloudFront
+ → AWS Shield (DDoS)
+ → WAF (optional)
+ → Authentication
+ → Throttling
+ → Request Validation
+ → Mapping / Proxy
+ → Backend Integration
+ → Response Mapping
+ → Client
+
+
+Failures can occur at any stage.
+
+8. Integration Types
+
+API Gateway integrates with:
+
+AWS Lambda
+
+HTTP endpoints
+
+AWS services (DynamoDB, SQS, SNS)
+
+Integration modes:
+
+Lambda Proxy Integration
+
+Lambda Non-Proxy Integration
+
+AWS Service Integration
+
+9. Lambda Proxy vs Non-Proxy Integration
+Lambda Proxy Integration
+
+Full HTTP request forwarded to Lambda
+
+Lambda returns full HTTP response
+
+Pros:
+
+Simple
+
+Easy debugging
+
+Less configuration
+
+Cons:
+
+Lambda must handle HTTP logic
+
+Default and recommended option
+
+Lambda Non-Proxy Integration
+
+API Gateway transforms requests using mapping templates
+
+Lambda receives custom payload
+
+Pros:
+
+Fine-grained control
+
+Cons:
+
+Complex
+
+Hard to debug
+
+Slower
+
+Use only when necessary
+
+10. Authentication & Authorization
+Supported Methods
+
+IAM Authentication
+
+Cognito User Pools
+
+Lambda Authorizers
+
+API Keys (metering only)
+
+Best Practice
+
+Cognito for user-based auth
+
+IAM for service-to-service calls
+
+11. Throttling & Rate Limiting
+
+Default regional limit: ~10,000 RPS
+
+Burst capacity: ~5,000
+
+Configurable at:
+
+API level
+
+Stage level
+
+Method level
+
+Returns 429 Too Many Requests when exceeded.
+
+12. Request Validation
+
+API Gateway can validate:
+
+Headers
+
+Query parameters
+
+Request body (JSON schema)
+
+Benefits:
+
+Blocks invalid requests early
+
+Reduces backend cost
+
+13. Caching
+API Gateway Cache
+
+Stage-level caching
+
+TTL-based
+
+Limitations
+
+Expensive
+
+Coarse-grained
+
+Alternatives:
+
+CloudFront
+
+DynamoDB DAX
+
+14. Error Handling
+Common Errors
+Code	Meaning
+403	Unauthorized
+429	Throttled
+500	Internal error
+504	Backend timeout
+Custom Gateway Responses
+
+Customize error messages
+
+Add CORS headers
+
+15. Logging, Monitoring & Tracing
+Logs
+
+Access Logs
+
+Execution Logs
+
+Lambda Logs
+
+Monitoring
+
+CloudWatch metrics
+
+Alarms
+
+Tracing
+
+AWS X-Ray
+
+16. Performance & Scaling
+
+API Gateway scales automatically
+
+No server management
+
+Backend must scale independently
+
+Latency added:
+
+~20–50 ms
+
+17. Limits & Quotas
+Limit	Value
+Timeout	29 seconds
+Request size	10 MB
+Response size	10 MB
+18. Common Issues & Solutions
+403 Forbidden
+
+Check IAM/Cognito permissions
+
+504 Timeout
+
+Lambda timeout
+
+Optimize backend
+
+CORS Errors
+
+Enable CORS
+
+Add headers in response
+
+429 Errors
+
+Increase limits
+
+Enable caching
+
+19. Cost Model & Optimization
+Pricing Factors
+
+Number of requests
+
+Data transfer
+
+Logging
+
+Caching
+
+Cost Optimization
+
+Use HTTP APIs
+
+Reduce logging in prod
+
+Cache frequently used endpoints
+
+20. Security Best Practices
+
+Enable WAF
+
+Use least-privilege IAM roles
+
+Private APIs for internal services
+
+Enable logging
+
+Rotate credentials
+
+21. When NOT to Use API Gateway
+
+Ultra-low latency systems
+
+Extremely high throughput workloads
+
+Long-running processes
+
+22. Comparison with Alternatives
+Service	Use Case
+API Gateway	Serverless APIs
+ALB	Low latency HTTP
+NLB	TCP/UDP traffic
+AppSync	GraphQL APIs
+23. Real-World Design Patterns
+Synchronous API
+API Gateway → Lambda → DynamoDB
+
+Asynchronous Processing
+API Gateway → Lambda → SQS → Worker
+
+File Upload
+API Gateway → Lambda → Pre-signed S3 URL
+
+24. Interview Questions & Answers
+
+Q: What is API Gateway?
+A managed service to create, secure, and scale APIs.
+
+Q: REST vs HTTP API?
+REST is feature-rich, HTTP is cheaper and faster.
+
+Q: Max timeout?
+29 seconds.
+
+Q: Proxy vs Non-Proxy?
+Proxy forwards full request, Non-Proxy transforms it.
+
+Q: How do you secure APIs?
+Cognito, IAM, WAF, private endpoints.
+
+25. Summary
+
+Amazon API Gateway is a fully managed API orchestration service that provides:
+
+Security
+
+Scalability
+
+Traffic management
+
+AWS-native integrations
+
+It is a core component of serverless architectures.
