@@ -1176,8 +1176,4 @@ Proxy forwarding turns API Gateway into a traffic router and Lambda into the ful
 REST API proxy uses event version 1.0
 
 HTTP API proxy uses event version 2.0 (lighter payload)
-
-
-
-
 _____________________________________________________________________________________________
