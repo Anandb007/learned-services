@@ -1,0 +1,261 @@
+What is Docker Networking?
+
+Docker networking allows containers to:
+
+Communicate with each other
+
+Communicate with the host
+
+Communicate across multiple hosts
+
+Docker provides multiple network drivers to support different use cases.
+
+🔹 Types of Docker Networks
+
+Bridge
+
+Host
+
+None
+
+Overlay
+
+Macvlan (advanced)
+
+1️⃣ Bridge Network
+What is Bridge Network?
+
+Default Docker network on a single host
+
+Containers get private IP addresses
+
+Uses a virtual bridge called docker0
+
+NAT is used for outbound traffic
+
+Architecture
+Container A ──┐
+              ├── docker0 bridge ── Host Network
+Container B ──┘
+
+Commands
+docker network ls
+docker network inspect bridge
+
+
+Run container on bridge:
+
+docker run -d --name web -p 80:80 nginx
+
+
+User-defined bridge (recommended):
+
+docker network create my-bridge
+docker run -d --network my-bridge nginx
+
+Real-Time Use Cases
+
+Jenkins + MySQL on the same EC2
+
+Microservices on a single VM
+
+Local development
+
+Container-to-container communication using names (DNS)
+
+2️⃣ Host Network
+What is Host Network?
+
+Container shares host’s network stack
+
+No network isolation
+
+No port mapping required
+
+Architecture
+Container ↔ Host Network (same IP, same ports)
+
+Command
+docker run -d --network host nginx
+
+Real-Time Use Cases
+
+High-performance applications
+
+Monitoring agents (node-exporter, datadog)
+
+Legacy apps requiring host networking
+
+Drawbacks
+
+Port conflicts
+
+Security risks
+
+Linux-only (limited on Docker Desktop)
+
+3️⃣ None Network
+What is None Network?
+
+Container has no external network access
+
+Only loopback (lo) interface available
+
+Command
+docker run -d --network none busybox sleep 1000
+
+Real-Time Use Cases
+
+Batch jobs
+
+File processing
+
+Data encryption/decryption
+
+Highly secure workloads
+
+4️⃣ Overlay Network (Multi-host)
+What is Overlay Network?
+
+Enables container communication across multiple Docker hosts
+
+Uses VXLAN tunneling
+
+Requires Docker Swarm
+
+Important Rule
+
+Overlay networks do not work without Docker Swarm
+
+Is Docker Swarm mandatory?
+
+✅ YES
+
+All nodes must:
+
+Have Docker installed
+
+Be part of the same Swarm cluster
+
+Swarm Setup Example
+
+Manager node
+
+docker swarm init
+
+
+Worker node
+
+docker swarm join --token <token> <manager-ip>:2377
+
+Create Overlay Network
+docker network create -d overlay my-overlay
+
+Service Creation Example
+docker service create \
+  --name backend \
+  --network my-overlay \
+  nginx
+
+What happens internally?
+
+Swarm schedules the service
+
+Container starts on any node
+
+Container gets overlay IP
+
+Docker DNS maps service name to container(s)
+
+Traffic is load-balanced automatically
+
+Service Discovery
+curl http://backend
+
+
+No IPs required — DNS is built-in.
+
+🔹 Same Subnet vs Different Subnet Communication
+Same Subnet
+
+Direct private IP communication
+
+Overlay VXLAN encapsulation
+
+Works out of the box
+
+Different Subnets
+
+Works if routing exists
+
+Subnets must be reachable (same VPC / peered VPC / VPN)
+
+Overlay abstracts the complexity
+
+Traffic Flow
+Container → VXLAN → Host IP → Network → Host IP → VXLAN → Container
+
+🔒 Required Ports for Overlay Networks
+Port	Protocol	Purpose
+2377	TCP	Swarm management
+7946	TCP/UDP	Node discovery
+4789	UDP	Overlay VXLAN traffic
+5️⃣ Macvlan Network (Advanced)
+What is Macvlan?
+
+Container gets its own IP from the physical network
+
+Appears as a real machine on the LAN
+
+Use Cases
+
+Legacy applications
+
+Direct LAN access
+
+No port mapping required
+
+⚠️ Requires careful configuration.
+
+🧠 Bridge vs Overlay (Quick Comparison)
+Feature	Bridge	Overlay
+Scope	Single host	Multi-host
+Swarm Required	❌ No	✅ Yes
+DNS Discovery	Limited	Built-in
+Production Use	Small setups	Large distributed systems
+🎯 Interview One-Liners
+
+Bridge → Default single-host networking
+
+Host → Best performance, no isolation
+
+None → Fully isolated container
+
+Overlay → Multi-host virtual network using VXLAN
+
+✅ Best Practices
+
+Use user-defined bridge networks
+
+Use overlay networks for production
+
+Avoid default bridge in real projects
+
+Never hardcode container IPs
+
+Always allow required Swarm ports
+
+📦 Real-World Examples
+
+Jenkins + MySQL → Bridge network
+
+Microservices on EC2 cluster → Overlay network
+
+Monitoring agents → Host network
+
+Batch processing jobs → None network
+
+📌 Summary
+
+Docker networking enables scalable, secure, and flexible container communication.
+Choosing the right network driver is critical for performance, security, and maintainability.
