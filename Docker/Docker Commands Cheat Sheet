@@ -98,3 +98,11 @@ _________________________________________
 | `docker-compose ps`   | List services  |
 | `docker-compose logs` | View logs      |
 __________________________________________
+
+
+docker tag my-app:1.0 \ <account-id>.dkr.ecr.us-east-1.amazonaws.com/my-app:1.0   -> Tag Image for ECR
+docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/my-app:1.0               -> Push Image to ECR
+docker pull <account-id>.dkr.ecr.us-east-1.amazonaws.com/my-app:1.0               -> Pull Image from ECR
+docker run -d \ --name my-app-container \ -p 80:80 \ <account-id>.dkr.ecr.us-east-1.amazonaws.com/my-app:1.0    -> Run Container from ECR Image
+
+
