@@ -1,0 +1,255 @@
+# AWS Developer Access Using IAM Identity Center (SSO)
+
+## 1. Purpose
+
+This document explains **how developer access to AWS is granted securely** using **AWS IAM Identity Center (SSO)**. It covers the **end-to-end flow** from access request to how application code accesses AWS services, following **industry best practices**.
+
+This approach avoids long-term access keys and follows the **principle of least privilege**.
+
+---
+
+## 2. Why IAM Identity Center (SSO)?
+
+Traditional IAM users rely on permanent access keys, which:
+
+* Are hard to rotate
+* Can be leaked
+* Are difficult to audit
+
+IAM Identity Center solves this by providing:
+
+* Centralized access management
+* Temporary credentials (STS)
+* MFA enforcement
+* Easy onboarding and offboarding
+* Multi-account access
+
+---
+
+## 3. High-Level Architecture
+
+```
+Developer
+  → IAM Identity Center (SSO)
+  → Permission Set
+  → IAM Role (auto-created)
+  → Temporary Credentials (STS)
+  → AWS Services (S3, Lambda, RDS, etc.)
+```
+
+---
+
+## 4. Roles & Responsibilities
+
+### Developer
+
+* Requests access
+* Uses SSO portal and AWS CLI
+* Does NOT manage credentials
+
+### DevOps / Cloud Engineer
+
+* Configures IAM Identity Center
+* Creates permission sets
+* Assigns access to users/groups
+* Ensures least privilege
+
+---
+
+## 5. Step-by-Step: Granting Access to a Developer
+
+### Step 1: Enable IAM Identity Center
+
+* Enabled in AWS Management Account
+* Works with AWS Organizations
+* Operates in a single AWS region
+
+---
+
+### Step 2: Configure Identity Source
+
+* AWS-managed Identity Store (for learning)
+* Or external IdP (Azure AD, Okta, Google)
+
+---
+
+### Step 3: Create Users and Groups
+
+Best practice:
+
+* Create groups such as `dev-team`, `qa-team`, `admin-team`
+* Add users to groups
+* Avoid assigning permissions to individual users
+
+---
+
+### Step 4: Create Permission Sets
+
+Permission sets define **what actions are allowed**.
+
+Examples:
+
+* ReadOnlyAccess
+* Developer-EC2-S3
+* Lambda-Invoke-Only
+
+Permission sets:
+
+* Contain IAM policies
+* Automatically create IAM roles in target accounts
+
+---
+
+### Step 5: Assign Access
+
+Assignments are done as:
+
+```
+Group → AWS Account → Permission Set
+```
+
+AWS automatically provisions IAM roles in the selected account.
+
+---
+
+## 6. Developer Access – AWS Console
+
+1. Developer opens AWS Access Portal URL
+2. Logs in using SSO credentials
+3. Selects AWS account
+4. Selects permission set (role)
+5. Redirected to AWS Console
+
+No IAM user is created.
+
+---
+
+## 7. Developer Access – Local Machine (CLI & Code)
+
+### 7.1 AWS CLI Configuration
+
+Developers use AWS CLI v2:
+
+```
+aws configure sso
+aws sso login --profile <profile-name>
+```
+
+This process:
+
+* Authenticates the user
+* Retrieves temporary credentials
+* Caches them locally
+
+---
+
+### 7.2 Temporary Credentials (Important)
+
+* Generated using AWS STS
+* Include:
+
+  * Access Key ID
+  * Secret Access Key
+  * Session Token
+* Automatically expire
+* Never manually created or shared
+
+---
+
+### 7.3 How Application Code Accesses AWS
+
+**Key Principle:**
+
+> Credentials belong to the environment, not the code.
+
+Application code uses the AWS SDK, which automatically retrieves credentials.
+
+Example (Python):
+
+```
+boto3.client("s3")
+```
+
+The SDK:
+
+1. Reads SSO cache
+2. Retrieves temporary credentials
+3. Signs AWS API requests
+
+No credentials are stored in code.
+
+---
+
+## 8. Accessing Specific AWS Services
+
+### S3 / Lambda / DynamoDB
+
+* Access controlled via permission set policies
+* AWS SDK handles authentication
+
+### RDS
+
+Two layers:
+
+1. AWS API access → via SSO / IAM role
+2. Database connection → DB credentials or IAM DB auth
+
+---
+
+## 9. Code Running Inside AWS (Production)
+
+When code runs inside AWS (Lambda, EC2, ECS, EKS):
+
+* No SSO
+* No CLI
+* No access keys
+
+Access is provided using **IAM roles**:
+
+* Lambda execution role
+* EC2 instance profile
+* ECS task role
+* EKS IRSA
+
+---
+
+## 10. Revoking Developer Access
+
+Access can be revoked by:
+
+* Removing user from SSO group
+* Disabling user in IdP
+
+Result:
+
+* Access removed across all AWS accounts instantly
+
+---
+
+## 11. Security Best Practices
+
+* Never create IAM users for developers
+* Never generate long-term access keys
+* Enforce MFA
+* Use least privilege permission sets
+* Enable CloudTrail for auditing
+
+---
+
+## 12. Common Interview Explanation (Summary)
+
+> Developers authenticate using AWS IAM Identity Center. Access is granted via permission sets mapped to IAM roles. Temporary credentials are issued using STS, and the AWS SDK automatically retrieves them. This avoids long-term access keys and follows AWS security best practices.
+
+---
+
+## 13. Key Takeaways
+
+* Humans use SSO
+* Workloads use IAM roles
+* Credentials are temporary
+* Code never stores secrets
+* Security and scalability are built-in
+
+---
+
+**End of Document**
